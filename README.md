@@ -8,7 +8,7 @@ Welcome to the Movies & TV-Series App, a simple and intuitive application design
 - **Settings:** Customize the app to your preferences by switching between different modes.
 
 ## Live-Demo
-Explore a live demo of the app [here](https://foodinfoapp.netlify.app/).
+Explore a live demo of the app [here](https://movietvseriesinfoapp.netlify.app/).
 
 ## Installation
 To install the app locally, follow these steps:
