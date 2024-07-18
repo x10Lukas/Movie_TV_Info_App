@@ -70,7 +70,7 @@ main {
 }
 
 .search-box {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   position: relative;
   display: flex;
   align-items: center;
@@ -317,12 +317,7 @@ hr {
   margin: 20px 0;
 }
 
-.search-box {
-  margin-bottom: 20px;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
+
 
 .dark-mode input {
   background-color: rgba(118, 118, 128, 0.24);
@@ -434,7 +429,7 @@ h3 {
 .movie-card {
   background-color: #fff;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-top: 20px;
   border-radius: 10px;
 }
 
@@ -468,5 +463,9 @@ h3 {
 @media screen and (max-width: 414px) {
   .ios-app {
     max-width: 100%;
+  }
+
+  .movie-info .ios-button {
+    margin-left: 17%;
   }
 }
