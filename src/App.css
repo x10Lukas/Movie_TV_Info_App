@@ -236,7 +236,7 @@ input::placeholder {
   right: 0;
   max-width: 414px;
   margin: 0 auto;
-  height: 90px;
+  height: 80px;
   border-top: 1px solid rgba(60, 60, 67, 0.29);
 }
 
@@ -442,7 +442,7 @@ h3 {
   background-color: rgba(28, 28, 30, 0.8);
   color: white;
   padding: 10px;
-  margin-top: 10px;
+  margin-top: 20px;
   border-radius: 10px;
   text-align: left;
 }
@@ -453,7 +453,10 @@ h3 {
 }
 
 .movie-info .ios-button {
-  text-align: left;
+  text-align: center;
+  background-color: #34C759;
+  width: auto;
+  margin-left: 20%;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -155,7 +155,7 @@ const App = () => {
                             <img src={result.Poster !== 'N/A' ? result.Poster : 'placeholder-image-url'} alt={result.Title} className="movie-poster" />
                             <p>Year: {result.Year}</p>
                             <p>Type: {result.Type === 'movie' ? 'Movie' : 'Serie'}</p>
-                            <button className="ios-button">&nbsp;&nbsp;+&nbsp;&nbsp;Zur Watchlist hinzufügen</button>
+                            <button className="ios-button">+&nbsp;&nbsp;Zur Watchlist hinzufügen</button>
                           </div>
                         </div>
                       ))}
