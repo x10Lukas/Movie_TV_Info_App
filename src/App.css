@@ -121,7 +121,20 @@ input::placeholder {
 
 .ios-button {
   width: 100%;
-  padding: 13px;
+  padding: 14.5px;
+  background-color: #007AFF;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.settings-list .ios-button {
+  width: 100%;
+  padding: 10px;
   background-color: #007AFF;
   color: #fff;
   border: none;
@@ -160,6 +173,7 @@ input::placeholder {
   align-items: center;
   padding: 8px 16px;
   border-bottom: 1px solid rgba(60, 60, 67, 0.29);
+  height: 35px;
 }
 
 .dark-mode .settings-list li {
@@ -358,8 +372,74 @@ hr {
   100% { transform: rotate(360deg); }
 }
 
+.login-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-dialog {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 93%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+}
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-group .ios-button {
+  padding: 7px;
+}
+
+.ios-button.secondary {
+  margin-left: 10px;
+  background-color: #ccc;
+}
+
+.dark-mode .login-dialog {
+  background-color: #333;
+  color: white;
+}
+
+.dark-mode .input-group input {
+  background-color: #444;
+  color: white;
+  border-color: #555;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #000000;
+  }
+}
+
+@media screen and (max-width: 414px) {
+  .ios-app {
+    max-width: 100%;
   }
 }

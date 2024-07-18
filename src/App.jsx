@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { Search, X, Cog } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, X, Cog, User } from 'lucide-react';
 import './App.css';
 
 const API_KEY = '48efb99c';
+
+const simulatedDB = {
+  users: {}
+};
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +15,19 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('search');
   const [darkMode, setDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const handleSearch = async () => {
     if (searchTerm.trim() === '') {
@@ -55,11 +72,47 @@ const App = () => {
     return null;
   };
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (username && password) {
+      if (username in simulatedDB.users) {
+        // Überprüfen des bestehenden Benutzers
+        if (simulatedDB.users[username].password === password) {
+          loginUser(username);
+        } else {
+          setError('Falsches Passwort. Bitte versuchen Sie es erneut.');
+        }
+      } else {
+        // Neuen Benutzer registrieren
+        simulatedDB.users[username] = { password, createdAt: new Date() };
+        loginUser(username);
+      }
+    } else {
+      setError('Bitte geben Sie Benutzername und Passwort ein.');
+    }
+  };
+
+  const loginUser = (username) => {
+    setIsLoggedIn(true);
+    setIsLoginDialogOpen(false);
+    setCurrentUser({ username, createdAt: simulatedDB.users[username].createdAt });
+    localStorage.setItem('currentUser', JSON.stringify({ username, createdAt: simulatedDB.users[username].createdAt }));
+    setUsername('');
+    setPassword('');
+    setError(null);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
+  };
+
   return (
     <div className={`ios-app ${darkMode ? 'dark-mode' : ''}`}>
       <div className="status-bar"></div>
       <header>
-        <h1>Filme & TV Serien</h1>
+        <h1>{activeTab === 'search' ? 'Filme & TV Serien' : 'Einstellungen'}</h1>
       </header>
       <main>
         <div className="ios-content">
@@ -90,12 +143,12 @@ const App = () => {
                 <>
                   {error && <p className="error-message">{error}</p>}
                   {searchResults && (
-                    <div className="food-info-display">
-                      <h2 className="food-name">{searchResults.Title}</h2>
-                      <div className="food-image-container">
-                        <img src={searchResults.Poster} alt={searchResults.Title} className="food-image" />
+                    <div className="movie-info-display">
+                      <h2 className="movie-name">{searchResults.Title}</h2>
+                      <div className="movie-image-container">
+                        <img src={searchResults.Poster} alt={searchResults.Title} className="movie-image" />
                       </div>
-                      <div className="food-details">
+                      <div className="movie-details">
                         {renderInfoItem('Jahr', searchResults.Year)}
                         {renderInfoItem('Erscheinungsdatum', searchResults.Released)}
                         {renderInfoItem('Laufzeit', searchResults.Runtime)}
@@ -113,6 +166,26 @@ const App = () => {
                 </>
               )}
             </>
+          )}
+          {activeTab === 'settings' && (
+            <ul className="settings-list">
+              <li>
+              <p className='account-text'>
+                {isLoggedIn ? `Username: ${currentUser.username}` : 'Account'}
+              </p>
+                <div className="account-section">
+                {isLoggedIn ? (
+                  <div>
+                    <button className="ios-button" onClick={handleLogout}>Abmelden</button>
+                  </div>
+                ) : (
+                  <div>
+                    <button className="ios-button" onClick={() => setIsLoginDialogOpen(true)}>Anmelden</button>
+                  </div>
+                )}
+                </div>
+              </li>
+            </ul>
           )}
           {activeTab === 'settings' && (
             <ul className="settings-list">
@@ -147,6 +220,39 @@ const App = () => {
           Einstellungen
         </button>
       </div>
+
+      {isLoginDialogOpen && (
+        <div className="login-dialog-overlay">
+          <div className="login-dialog">
+            <h2>Anmelden / Registrieren</h2>
+            <form onSubmit={handleLogin}>
+              <div className="input-group">
+                <label htmlFor="username">Benutzername</label>
+                <input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="input-group">
+                <label htmlFor="password">Passwort</label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {error && <p className="error-message">{error}</p>}
+              <div className="button-group">
+                <button type="submit" className="ios-button">Anmelden / Registrieren</button>
+                <button type="button" className="ios-button secondary" onClick={() => setIsLoginDialogOpen(false)}>Abbrechen</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
