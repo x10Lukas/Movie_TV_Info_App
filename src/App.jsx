@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Cog, User } from 'lucide-react';
+import { Search, X, Cog } from 'lucide-react';
 import './App.css';
 
 const API_KEY = '48efb99c';
