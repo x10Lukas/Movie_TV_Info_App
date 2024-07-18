@@ -23,7 +23,7 @@ const App = () => {
     setSearchResults(null);
 
     try {
-      const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${searchTerm}`);
+      const response = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${searchTerm}`);
       const data = await response.json();
 
       if (data.Response === 'True') {
