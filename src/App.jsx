@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Cog } from 'lucide-react';
+import { Search, X, Cog, TvMinimalPlay } from 'lucide-react';
 import './App.css';
 
 const API_KEY = '48efb99c';
@@ -10,7 +10,7 @@ const simulatedDB = {
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('search');
   const [darkMode, setDarkMode] = useState(false);
@@ -29,6 +29,16 @@ const App = () => {
     }
   }, []);
 
+  const fetchResults = async (type) => {
+    const response = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(searchTerm)}&type=${type}`);
+    const data = await response.json();
+    console.log(`API Antwort für ${type}:`, data);
+    if (data.Response === 'True' && data.Search && data.Search.length > 0) {
+      return data.Search;
+    }
+    return [];
+  };
+
   const handleSearch = async () => {
     if (searchTerm.trim() === '') {
       setError('Bitte geben Sie einen Suchbegriff ein.');
@@ -37,18 +47,21 @@ const App = () => {
 
     setIsLoading(true);
     setError(null);
-    setSearchResults(null);
+    setSearchResults([]);
 
     try {
-      const response = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${searchTerm}`);
-      const data = await response.json();
-
-      if (data.Response === 'True') {
-        setSearchResults(data);
+      const movieResults = await fetchResults('movie');
+      const seriesResults = await fetchResults('series');
+      
+      const combinedResults = [...movieResults, ...seriesResults];
+      
+      if (combinedResults.length > 0) {
+        setSearchResults(combinedResults);
       } else {
-        setError('Keine Ergebnisse gefunden.');
+        setError('Keine Ergebnisse gefunden. Bitte überprüfen Sie Ihre Suchanfrage.');
       }
     } catch (error) {
+      console.error('Fehler bei der API-Anfrage:', error);
       setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
     } finally {
       setIsLoading(false);
@@ -57,33 +70,20 @@ const App = () => {
 
   const handleClear = () => {
     setSearchTerm('');
-    setSearchResults(null);
+    setSearchResults([]);
     setError(null);
-  };
-
-  const renderInfoItem = (label, value) => {
-    if (value && value !== 'N/A') {
-      return (
-        <p className="description">
-          <strong>{label}:</strong> {value}
-        </p>
-      );
-    }
-    return null;
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (username && password) {
       if (username in simulatedDB.users) {
-        // Überprüfen des bestehenden Benutzers
         if (simulatedDB.users[username].password === password) {
           loginUser(username);
         } else {
           setError('Falsches Passwort. Bitte versuchen Sie es erneut.');
         }
       } else {
-        // Neuen Benutzer registrieren
         simulatedDB.users[username] = { password, createdAt: new Date() };
         loginUser(username);
       }
@@ -112,7 +112,11 @@ const App = () => {
     <div className={`ios-app ${darkMode ? 'dark-mode' : ''}`}>
       <div className="status-bar"></div>
       <header>
-        <h1>{activeTab === 'search' ? 'Filme & TV Serien' : 'Einstellungen'}</h1>
+      <h1>
+        {activeTab === 'search' ? 'Filme & TV Serien' :
+        activeTab === 'watchlist' ? 'Watchlist' :
+        'Einstellungen'}
+      </h1>
       </header>
       <main>
         <div className="ios-content">
@@ -142,25 +146,19 @@ const App = () => {
               ) : (
                 <>
                   {error && <p className="error-message">{error}</p>}
-                  {searchResults && (
-                    <div className="movie-info-display">
-                      <h2 className="movie-name">{searchResults.Title}</h2>
-                      <div className="movie-image-container">
-                        <img src={searchResults.Poster} alt={searchResults.Title} className="movie-image" />
-                      </div>
-                      <div className="movie-details">
-                        {renderInfoItem('Jahr', searchResults.Year)}
-                        {renderInfoItem('Erscheinungsdatum', searchResults.Released)}
-                        {renderInfoItem('Laufzeit', searchResults.Runtime)}
-                        {renderInfoItem('Genre', searchResults.Genre)}
-                        {renderInfoItem('Regisseur', searchResults.Director)}
-                        {renderInfoItem('Drehbuchautor', searchResults.Writer)}
-                        {renderInfoItem('Schauspieler', searchResults.Actors)}
-                        {renderInfoItem('Handlung', searchResults.Plot)}
-                        {renderInfoItem('Land', searchResults.Country)}
-                        {renderInfoItem('Sprache', searchResults.Language)}
-                        {renderInfoItem('IMDb-Bewertung', `${searchResults.imdbRating}/10`)}
-                      </div>
+                  {searchResults.length > 0 && (
+                    <div className="search-results">
+                      {searchResults.map((result) => (
+                        <div key={result.imdbID} className="movie-card">
+                          <div className="movie-info">
+                            <h3>{result.Title}</h3>
+                            <img src={result.Poster !== 'N/A' ? result.Poster : 'placeholder-image-url'} alt={result.Title} className="movie-poster" />
+                            <p>Year: {result.Year}</p>
+                            <p>Type: {result.Type === 'movie' ? 'Movie' : 'Serie'}</p>
+                            <button className="ios-button">&nbsp;&nbsp;+&nbsp;&nbsp;Zur Watchlist hinzufügen</button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </>
@@ -187,6 +185,10 @@ const App = () => {
               </li>
             </ul>
           )}
+          {activeTab === 'watchlist' && (
+            <ul className="settings-list">
+            </ul>
+          )}
           {activeTab === 'settings' && (
             <ul className="settings-list">
               <li>
@@ -211,6 +213,13 @@ const App = () => {
         >
           <Search size={24} />
           Suche
+        </button>
+        <button
+          className={activeTab === 'watchlist' ? 'active' : ''}
+          onClick={() => setActiveTab('watchlist')}
+        >
+          <TvMinimalPlay size={24} />
+          Watchlist
         </button>
         <button
           className={activeTab === 'settings' ? 'active' : ''}
