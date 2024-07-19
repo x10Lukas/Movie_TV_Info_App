@@ -442,16 +442,15 @@ hr {
 }
 
 h3 {
-  font-size: 15px;
+  font-size: 14px;
   text-align: left;
   margin-left: 60px;
   max-width: 200px; 
   word-wrap: break-word;
 }
 
-
 h4 {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: normal;
   text-align: left;
   margin-left: 60px;
@@ -524,5 +523,9 @@ h4 {
 
   .movie-remove-button {
     margin-left: 245px;
+  }
+
+  h3 {
+    max-width: 170px;
   }
 }
