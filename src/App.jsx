@@ -149,7 +149,7 @@ const App = () => {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Film oder Serie suchen"
+                  placeholder="Film oder TV-Serie suchen"
                 />
                 {searchTerm && (
                   <button className="clear-button" onClick={handleClear}>
