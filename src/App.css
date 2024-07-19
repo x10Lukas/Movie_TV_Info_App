@@ -136,6 +136,7 @@ input::placeholder {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: -2px;
 }
 
 .ios-button:active {
@@ -271,7 +272,7 @@ input::placeholder {
   margin-bottom: 4px;
 }
 
-.movie-info-display {
+.movie-card-display {
   margin-top: 30px;
   text-align: center;
 }
@@ -420,17 +421,15 @@ hr {
   border-color: #555;
 }
 
-h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-top: 5px;
-}
-
 .movie-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   background-color: #fff;
   padding: 10px;
   margin-top: 20px;
   border-radius: 10px;
+  height: 75px;
 }
 
 .dark-mode .movie-card {
@@ -442,16 +441,66 @@ h3 {
   text-align: left;
 }
 
-.movie-card img {
-  width: calc(50% - 30px);
-  margin-left: 30%;
+h3 {
+  font-size: 15px;
+  text-align: left;
+  margin-left: 60px;
+  max-width: 200px; 
+  word-wrap: break-word;
 }
 
-.movie-info .ios-button {
+
+h4 {
+  font-size: 15px;
+  font-weight: normal;
+  text-align: left;
+  margin-left: 60px;
+  margin-top: -10px;
+}
+
+.image {
+  width: 50px;
+  height: 70px;
+  border: 1px solid #ccc;
+  position: absolute;
+}
+
+.movie-button {
+  position: absolute;
+  width: auto;
+  padding: 8.5px;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
   text-align: center;
   background-color: #34C759;
+  margin-left: 260px;
+}
+
+.movie-remove-button {
+  position: absolute;
   width: auto;
-  margin-left: 20%;
+  padding: 8.5px;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  background-color: #c73434;
+  margin-left: 270px;
+}
+
+.movie-about {
+  border: none;
+  background-color: white;
+  cursor: pointer;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -465,7 +514,15 @@ h3 {
     max-width: 100%;
   }
 
-  .movie-info .ios-button {
+  .movie-card .ios-button {
     margin-left: 17%;
+  }
+
+  .movie-button {
+    margin-left: 235px;
+  }
+
+  .movie-remove-button {
+    margin-left: 245px;
   }
 }

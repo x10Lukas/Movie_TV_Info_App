@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Cog, TvMinimalPlay } from 'lucide-react';
+import { Search, X, Cog, TvMinimalPlay, Plus } from 'lucide-react';
 import './App.css';
 
 const API_KEY = '48efb99c';
@@ -20,6 +20,8 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [watchlist, setWatchlist] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
@@ -27,12 +29,19 @@ const App = () => {
       setCurrentUser(JSON.parse(savedUser));
       setIsLoggedIn(true);
     }
+    const savedWatchlist = localStorage.getItem('watchlist');
+    if (savedWatchlist) {
+      setWatchlist(JSON.parse(savedWatchlist));
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('watchlist', JSON.stringify(watchlist));
+  }, [watchlist]);
 
   const fetchResults = async (type) => {
     const response = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(searchTerm)}&type=${type}`);
     const data = await response.json();
-    console.log(`API Antwort für ${type}:`, data);
     if (data.Response === 'True' && data.Search && data.Search.length > 0) {
       return data.Search;
     }
@@ -108,15 +117,27 @@ const App = () => {
     localStorage.removeItem('currentUser');
   };
 
+  const addToWatchlist = (item) => {
+    if (!watchlist.some(watchlistItem => watchlistItem.imdbID === item.imdbID)) {
+      setWatchlist([...watchlist, item]);
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false), 2000);
+    }
+  };
+
+  const removeFromWatchlist = (imdbID) => {
+    setWatchlist(watchlist.filter(item => item.imdbID !== imdbID));
+  };
+
   return (
     <div className={`ios-app ${darkMode ? 'dark-mode' : ''}`}>
       <div className="status-bar"></div>
       <header>
-      <h1>
-        {activeTab === 'search' ? 'Filme & TV Serien' :
-        activeTab === 'watchlist' ? 'Watchlist' :
-        'Einstellungen'}
-      </h1>
+        <h1>
+          {activeTab === 'search' ? 'Filme & TV Serien' :
+          activeTab === 'watchlist' ? 'Watchlist' :
+          'Einstellungen'}
+        </h1>
       </header>
       <main>
         <div className="ios-content">
@@ -150,13 +171,12 @@ const App = () => {
                     <div className="search-results">
                       {searchResults.map((result) => (
                         <div key={result.imdbID} className="movie-card">
-                          <div className="movie-info">
+                          <div className='movie-text'>
                             <h3>{result.Title}</h3>
-                            <img src={result.Poster !== 'N/A' ? result.Poster : 'placeholder-image-url'} alt={result.Title} className="movie-poster" />
-                            <p>Year: {result.Year}</p>
-                            <p>Type: {result.Type === 'movie' ? 'Movie' : 'Serie'}</p>
-                            <button className="ios-button">+&nbsp;&nbsp;Zur Watchlist hinzufügen</button>
+                            <h4>{result.Year}</h4>
                           </div>
+                          <img className='image' src={result.Poster !== 'N/A' ? result.Poster : 'placeholder-image-url'} alt={result.Title} />
+                          <button className="movie-button" onClick={() => addToWatchlist(result)}>+ Watchlist</button>
                         </div>
                       ))}
                     </div>
@@ -165,28 +185,39 @@ const App = () => {
               )}
             </>
           )}
+          {activeTab === 'watchlist' && (
+            <div className="watchlist">
+              {watchlist.map((item) => (
+                <div key={item.imdbID} className="movie-card">
+                  <div className='movie-text'>
+                    <h3>{item.Title}</h3>
+                    <h4>{item.Year}</h4>
+                  </div>
+                  <img className='image' src={item.Poster !== 'N/A' ? item.Poster : 'placeholder-image-url'} alt={item.Title} />
+                  <button className='movie-remove-button' onClick={() => removeFromWatchlist(item.imdbID)}>Entfernen</button>
+                </div>
+              ))}
+              {watchlist.length === 0 && <p>Ihre Watchlist ist leer.</p>}
+            </div>
+          )}
           {activeTab === 'settings' && (
             <ul className="settings-list">
               <li>
-              <p className='account-text'>
-                {isLoggedIn ? `Username: ${currentUser.username}` : 'Account'}
-              </p>
+                <p className='account-text'>
+                  {isLoggedIn ? `Username: ${currentUser.username}` : 'Account'}
+                </p>
                 <div className="account-section">
-                {isLoggedIn ? (
-                  <div>
-                    <button className="ios-button" onClick={handleLogout}>Abmelden</button>
-                  </div>
-                ) : (
-                  <div>
-                    <button className="ios-button" onClick={() => setIsLoginDialogOpen(true)}>Anmelden</button>
-                  </div>
-                )}
+                  {isLoggedIn ? (
+                    <div>
+                      <button className="ios-button" onClick={handleLogout}>Abmelden</button>
+                    </div>
+                  ) : (
+                    <div>
+                      <button className="ios-button" onClick={() => setIsLoginDialogOpen(true)}>Anmelden</button>
+                    </div>
+                  )}
                 </div>
               </li>
-            </ul>
-          )}
-          {activeTab === 'watchlist' && (
-            <ul className="settings-list">
             </ul>
           )}
           {activeTab === 'settings' && (
@@ -260,6 +291,12 @@ const App = () => {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {showPopup && (
+        <div className="popup">
+          Erfolgreich zur Watchlist hinzugefügt
         </div>
       )}
     </div>
